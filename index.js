@@ -1,6 +1,10 @@
-const { Client, Intents } = require("discord.js")
+const { Client, Collection, Intents } = require("discord.js")
 const nhentai = require('nhentai-js')
+const mongoose = require('./database/mongoose')
+const fs = require('node:fs');
 require('dotenv').config();
+
+mongoose.init();
 
 const client = new Client({
     intents:[
@@ -9,24 +13,50 @@ const client = new Client({
     ]
 })
 
+client.commands = new Collection();
+
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	// Set a new item in the Collection
+	// With the key as the command name and the value as the exported module
+	client.commands.set(command.data.name, command);
+}
+
 client.on('ready', () => {
     console.log(`The bot is ready. \nLogged in as ${client.user.tag}`)
 })
+
+client.on('interactionCreate', async interaction => {
+	if (!interaction.isCommand()) return;
+
+	const command = client.commands.get(interaction.commandName);
+
+	if (!command) return;
+
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+	}
+});
+
 
 const sixNumsRegex = /\b\d{6}\b/g;
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
     let digits = message.content.match(sixNumsRegex)
     if (digits) {
-        console.log(`Digits: ${digits}`);
-        console.log(digits);
-        console.log(typeof digits);
+        // console.log(`Digits: ${digits}`);
+        // console.log(digits);
+        // console.log(typeof digits);
         for (const sauce in digits) {
             try {
-                console.log(`Sauce: ${digits[sauce]}`);
+                // console.log(`Sauce: ${digits[sauce]}`);
                 let nhentaiResponse = await getDojinInfo(digits[sauce]);
-                console.log(nhentaiResponse);
-                console.log(`Title: ${nhentaiResponse.title}`);
+                // console.log(nhentaiResponse);
+                // console.log(`Title: ${nhentaiResponse.title}`);
                 message.reply({
                     content: formResponse(nhentaiResponse)
                 })
@@ -36,6 +66,9 @@ client.on('messageCreate', async (message) => {
         }
     }
 })
+
+
+
 
 async function getDojinInfo(sauce) {
     // console.log(sauce)
