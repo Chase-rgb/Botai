@@ -61,11 +61,15 @@ client.on('messageCreate', async (message) => {
             try {
                 // console.log(`Sauce: ${digits[sauce]}`);
                 let nhentaiResponse = await getDojinInfo(digits[sauce]);
-                // console.log(nhentaiResponse);
-                // console.log(`Title: ${nhentaiResponse.title}`);
-                message.reply({
-                    content: formResponse(nhentaiResponse)
-                })
+                if (nhentaiResponse) {
+                    message.reply({
+                        content: formResponse(nhentaiResponse)
+                    })
+                } else {
+                    message.reply({
+                        content: `Doujin ${digits[sauce]} doesn't exist`
+                    })
+                }
             } catch (e) {
                 console.log(e)
             }
@@ -76,10 +80,12 @@ client.on('messageCreate', async (message) => {
 
 async function getDojinInfo(sauce) {
     // console.log(sauce)
-    if(nhentai.exists(sauce)) { // checks if doujin exists
+    if(await nhentai.exists(sauce)) { // checks if doujin exists
         const dojin = await nhentai.getDoujin(sauce)
         // console.log(dojin);
         return dojin;
+    } else {
+        return null;
     }
 }
 

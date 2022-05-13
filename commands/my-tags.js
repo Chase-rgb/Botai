@@ -2,28 +2,11 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const mongoose = require('../database/mongoose');
 
 const embed = {
-    "title": `Help Commands`,
+    "title": `Subscribed Tags`,
     "description": "",
     "color": 0xff009d,
-    "fields": [],
-    // "fields": [
-    //   {
-    //     "name": `/subscribe`,
-    //     "value": `Get pinged if someone post some sauce with a tag you enjoy`
-    //   },
-    //   {
-    //     "name": `/unsubcribe`,
-    //     "value": `No longer get pinged when someone posts sauce with given tag`
-    //   },
-    //   {
-    //     "name": `/myTags`,
-    //     "value": `List your subscribed tags`
-    //   }
-    // ],
     "thumbnail": {
       "url": `https://i.imgur.com/uLAimaY.png`,
-      "height": 0,
-      "width": 0
     }
   };
 
