@@ -1,10 +1,10 @@
-const { Client, Collection, Intents } = require("discord.js")
-const nhentai = require('nhentai-js')
-const mongoose = require('./database/mongoose')
+const { Client, Collection, Intents } = require("discord.js");
+const nhentai = require('nhentai-js');
+const mongoose = require('./database/mongoose');
 const fs = require('node:fs');
 require('dotenv').config();
 
-mongoose.init();
+
 
 const client = new Client({
     intents:[
@@ -23,8 +23,14 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log(`The bot is ready. \nLogged in as ${client.user.tag}`)
+    await mongoose.init();
+    // var testUser = await mongoose.createUser({
+    //     username: "Test",
+    //     discordId: "1234567890"
+    // })
+    // await mongoose.addTagToUser(280538761710796800, "Sci-Fi");
 })
 
 client.on('interactionCreate', async interaction => {
@@ -66,8 +72,6 @@ client.on('messageCreate', async (message) => {
         }
     }
 })
-
-
 
 
 async function getDojinInfo(sauce) {
