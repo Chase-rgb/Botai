@@ -19,7 +19,8 @@ module.exports = {
     console.log(response);
     if (response) {
         var tagList = ""
-        response.tags.forEach(tag => tagList += tag + "\n");
+        const tags = response.tags.sort();
+        tags.forEach(tag => tagList += tag + "\n");
         embed.description = tagList;
         // console.log(embed);
     }
