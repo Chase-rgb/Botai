@@ -4,8 +4,6 @@ const mongoose = require('./database/mongoose');
 const fs = require('node:fs');
 require('dotenv').config();
 
-
-
 const client = new Client({
     intents:[
         Intents.FLAGS.GUILDS,
@@ -15,6 +13,7 @@ const client = new Client({
 
 client.commands = new Collection();
 
+//Sets up list of command files and sets them on the client
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
@@ -23,77 +22,16 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
-client.on('ready', async () => {
-    console.log(`The bot is ready. \nLogged in as ${client.user.tag}`)
-    await mongoose.init();
-    // var testUser = await mongoose.createUser({
-    //     username: "Test",
-    //     discordId: "1234567890"
-    // })
-    // await mongoose.addTagToUser(280538761710796800, "Sci-Fi");
-})
-
-client.on('interactionCreate', async interaction => {
-	if (!interaction.isCommand()) return;
-
-	const command = client.commands.get(interaction.commandName);
-
-	if (!command) return;
-
-	try {
-		await command.execute(interaction);
-	} catch (error) {
-		console.error(error);
-		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-	}
-});
-
-
-const sixNumsRegex = /\b\d{6}\b/g;
-client.on('messageCreate', async (message) => {
-    if (message.author.bot) return;
-    let digits = message.content.match(sixNumsRegex)
-    if (digits) {
-        // console.log(`Digits: ${digits}`);
-        // console.log(digits);
-        // console.log(typeof digits);
-        for (const sauce in digits) {
-            try {
-                // console.log(`Sauce: ${digits[sauce]}`);
-                let nhentaiResponse = await getDojinInfo(digits[sauce]);
-                if (nhentaiResponse) {
-                    message.reply({
-                        content: formResponse(nhentaiResponse)
-                    })
-                } else {
-                    message.reply({
-                        content: `Doujin ${digits[sauce]} doesn't exist`
-                    })
-                }
-            } catch (e) {
-                console.log(e)
-            }
-        }
-    }
-})
-
-
-async function getDojinInfo(sauce) {
-    // console.log(sauce)
-    if(await nhentai.exists(sauce)) { // checks if doujin exists
-        const dojin = await nhentai.getDoujin(sauce)
-        // console.log(dojin);
-        return dojin;
+//Sets up list of event files and sets them on client
+const eventFiles = fs.readdirSync(`./events/`).filter(file => file.endsWith('.js'));
+for (const file of eventFiles) {
+    const event = require(`./events/${file}`);
+    if (event.once) {
+        client.once(event.name, (...args) => event.execute(...args));
     } else {
-        return null;
+        client.on(event.name, (...args) => event.execute(...args));
     }
 }
 
-function formResponse(dojin) {
-    let response = ""
-    response += dojin.link + '\n';
-    response += dojin.title + '\n';
-    return response;
-}
 
 client.login(process.env.TOKEN);

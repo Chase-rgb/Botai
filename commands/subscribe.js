@@ -7,7 +7,7 @@ module.exports = {
         .setDescription('Get pinged when someone posts a doujin with this tag')
         .addStringOption(option => 
             option.setName('tags')
-                .setDescription("Tag being subscribed to")
+                .setDescription("Tag being subscribed to. If subcribing with multiple tags, separate with commas")
                 .setRequired(true)),
 	async execute(interaction) {
         const tags = interaction.options.getString('tags').split(/, |,/).map(x => x.toLowerCase());

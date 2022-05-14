@@ -9,16 +9,19 @@ const embed = {
       "url": `https://i.imgur.com/uLAimaY.png`,
     }
   };
-
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('my-tags')
 		.setDescription('Shows currently subscribed tags'),
 	async execute(interaction) {
-		const tags = await mongoose.getTags(interaction.user.id);
-    // console.log (tags);
-		tags.forEach(tag => embed.description = embed.description + tag + "\n");
-    // console.log(embed);
+		const tags = (await mongoose.getTags(interaction.user.id));
+    if (tags) {
+        // console.log (tags);
+        var tagList = ""
+        tags.forEach(tag => tagList += tag + "\n");
+        embed.description = tagList;
+        // console.log(embed);
+    }
 		await interaction.reply({ embeds: [embed] });
 	},
 };

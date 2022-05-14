@@ -7,7 +7,7 @@ module.exports = {
         .setDescription('Unsubscribe from a tag')
         .addStringOption(option => 
             option.setName('tags')
-                .setDescription("Tags being unsubscribed from")
+                .setDescription("Tags being unsubscribed from. If unsubcribing with multiple tags, separate with commas")
                 .setRequired(true)),
 	async execute(interaction) {
 		const tags = interaction.options.getString('tags').split(/, |,/).map(x => x.toLowerCase());

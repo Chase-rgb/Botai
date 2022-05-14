@@ -29,26 +29,25 @@ const init = async () => {
     })
 };
 
-const createUser = (user) => {
-    return User.create(user).then(message => {
-        console.log("\n>>User Created: ", message)
-        return message;
-    })
-};
+// const createUser = (user) => {
+//     return User.create(user).then(message => {
+//         console.log("\n>>User Created: ", message)
+//         return message;
+//     })
+// };
 
 
 const addTagToUser = (userId, tag) => {
     console.log(`Adding tags: ${tag} to userID ${userId}`);
     return User.findByIdAndUpdate(
         userId,
-        { $addToSet: { tags: tag }},
-        { new: true}
+        { $addToSet: { tags: { $each: tag}}},
+        { new: true, upsert:true }
     );
 };
 
 const getTags = async (userId) => {
-    const response = await User.find({ _id : userId });
-    return response[0].tags.sort();
+    return User.find({ _id : userId });
 }
 
 const removeTagFromUser = (userId, tag) => {
@@ -57,13 +56,29 @@ const removeTagFromUser = (userId, tag) => {
         userId,
         { $pull: {tags: {$in: tag}}},
         { new: true }
-    )
+    );
+}
+
+const findSubscribers = (tags) => {
+    return User.find({
+        tags: {$elemMatch: {$in : tags}}
+    }).exec();
+}
+
+const clearTags = (userId) => {
+    return User.findByIdAndUpdate(
+        userId,
+        {$unset: {tags: ""}},
+        {new: true}
+    );
 }
 
 module.exports = {
     init,
-    createUser,
+    // createUser,
     addTagToUser,
     removeTagFromUser,
-    getTags
+    getTags,
+    findSubscribers,
+    clearTags
 };

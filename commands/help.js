@@ -16,6 +16,10 @@ const embed = {
       {
         "name": `/my-tags`,
         "value": `List your subscribed tags`
+      },
+      {
+        "name": `/clear-subscriptions`,
+        "value": `Removes all your subscriptions`
       }
     ],
     "thumbnail": {
