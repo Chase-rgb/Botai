@@ -1,6 +1,5 @@
 const { Client, Collection, Intents } = require("discord.js");
-const nhentai = require('nhentai-js');
-const mongoose = require('./database/mongoose');
+const deployCommands = require(`./deploy-commands`);
 const fs = require('node:fs');
 require('dotenv').config();
 
@@ -35,3 +34,4 @@ for (const file of eventFiles) {
 
 
 client.login(process.env.TOKEN);
+deployCommands.execute();
