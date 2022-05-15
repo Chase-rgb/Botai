@@ -69,22 +69,26 @@ module.exports = {
         let digits = interaction.content.match(sixNumsRegex)
         if (digits) {
             for (const sauce in digits) {
-                try {
-                    // console.log(`Sauce: ${digits[sauce]}`);
-                    let nhentaiResponse = await getDojinInfo(digits[sauce]);
-                    if (nhentaiResponse) {
-                        const subscribers = await getSubscribers(nhentaiResponse.details.tags);
-                        interaction.reply({
-                            content: formResponse(nhentaiResponse, subscribers)
-                        })
-                    } else {
-                        interaction.reply({
-                            content: `Doujin ${digits[sauce]} doesn't exist`
-                        })
-                    }
-                } catch (e) {
-                    console.log(e)
-                }
+                interaction.reply({
+                    content: `https://nhentai.net/g/${digits[sauce]}`
+                })
+                // try {
+                //     console.log(`Sauce: ${digits[sauce]}`);
+                //     let nhentaiResponse = await getDojinInfo(digits[sauce]);
+                //     console.log(nhentaiResponse);
+                //     if (nhentaiResponse) {
+                //         const subscribers = await getSubscribers(nhentaiResponse.details.tags);
+                //         interaction.reply({
+                //             content: formResponse(nhentaiResponse, subscribers)
+                //         })
+                //     } else {
+                //         interaction.reply({
+                //             content: `Doujin ${digits[sauce]} doesn't exist`
+                //         })
+                //     }
+                // } catch (e) {
+                //     console.log(e)
+                // }
             }
         }
     }

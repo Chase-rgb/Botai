@@ -17,6 +17,7 @@
     "dotenv": "^16.0.0",
     "fs": "^0.0.1-security",
     "mongoose": "^6.3.3",
+    "nhentai-api": "^3.4.3",
     "nhentai-js": "^4.0.0"
   }
 }
