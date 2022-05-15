@@ -15,6 +15,7 @@ module.exports = {
 		.setName('my-tags')
 		.setDescription('Shows currently subscribed tags'),
 	async execute(interaction) {
+    embed.description = "";
 		const response = (await mongoose.getTags(interaction.user.id))[0];
     console.log(response);
     if (response) {
