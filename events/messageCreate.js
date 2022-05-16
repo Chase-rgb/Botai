@@ -46,7 +46,6 @@ function formResponse(dojin, subscribers) {
 }
 
 async function getSubscribers(tags) {
-    tags = tagsCleanup(tags);
     // const subscriberSet = new Set();
     const subs = (await mongoose.findSubscribers(tags)).map(entry => entry._id);
     console.log(subs);
@@ -64,10 +63,23 @@ const sixNumsRegex = /\b\d{6}\b/g;
 module.exports = {
     name: 'messageCreate',
     async execute(interaction) {
-        // console.log(interaction.author);
-        if (interaction.author.bot) return;
+        console.log(interaction);
+        if (interaction.author.bot) {
+            if ( interaction.type != 'REPLY' || interaction.author.id != process.env.CLIENT_ID || interaction.embeds.length === 0) {return;}
+            else {
+                var response = ""
+                console.log(interaction.embeds[0].description);
+                const tags = interaction.embeds[0].description.split(/, |,/).map(x => x.toLowerCase());
+                const subscribers = await getSubscribers(tags);
+                if (subscribers.length === 0) return;
+                subscribers.forEach(sub => response += `<@${sub}> `);
+                interaction.reply({
+                    content: response
+                });
+            }
+        };
         let digits = interaction.content.match(sixNumsRegex)
-        if (digits) {
+        if (digits && interaction.type == 'DEFAULT') {
             for (const sauce in digits) {
                 interaction.reply({
                     content: `https://nhentai.net/g/${digits[sauce]}`
@@ -77,7 +89,7 @@ module.exports = {
                 //     let nhentaiResponse = await getDojinInfo(digits[sauce]);
                 //     console.log(nhentaiResponse);
                 //     if (nhentaiResponse) {
-                //         const subscribers = await getSubscribers(nhentaiResponse.details.tags);
+                //         const subscribers = await getSubscribers(tagsCleanup(nhentaiResponse.details.tags));
                 //         interaction.reply({
                 //             content: formResponse(nhentaiResponse, subscribers)
                 //         })
