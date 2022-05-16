@@ -84,6 +84,7 @@ module.exports = {
                 interaction.reply({
                     content: `https://nhentai.net/g/${digits[sauce]}`
                 })
+                
                 // try {
                 //     console.log(`Sauce: ${digits[sauce]}`);
                 //     let nhentaiResponse = await getDojinInfo(digits[sauce]);
