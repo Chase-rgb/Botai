@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const path = require('path');
+const blacklist = require('../commands/blacklist');
 const User = require(path.resolve(__dirname, "./userSchema.js"))
 // const Tag = require(path.resolve(__dirname, "./tags.js"))
 require('dotenv').config();
@@ -42,6 +43,15 @@ const addTagToUser = (userId, tag) => {
     return User.findByIdAndUpdate(
         userId,
         { $addToSet: { tags: { $each: tag}}},
+        { new: true, upsert: true}
+    );
+};
+
+const addBlacklistToUser = (userId, tag) => {
+    console.log(`Adding blacklist: ${tag} to userID ${userId}`);
+    return User.findByIdAndUpdate(
+        userId,
+        { $addToSet: { blacklist: { $each: tag}}},
         { new: true, upsert:true }
     );
 };
@@ -49,6 +59,7 @@ const addTagToUser = (userId, tag) => {
 const getTags = async (userId) => {
     return User.find({ _id : userId });
 }
+
 
 const removeTagFromUser = (userId, tag) => {
     console.log(`Removing tags: ${tag} from userID: ${userId}`);
@@ -60,9 +71,12 @@ const removeTagFromUser = (userId, tag) => {
 }
 
 const findSubscribers = (tags) => {
-    return User.find({
-        tags: {$elemMatch: {$in : tags}}
-    }).exec();
+    return User.find(
+        { $and : [
+            {tags: {$elemMatch: {$in : tags}}},
+            {blacklist: { $not: {$elemMatch: {$in: tags}}}}
+        ]}
+    );
 }
 
 const clearTags = (userId) => {
@@ -80,5 +94,6 @@ module.exports = {
     removeTagFromUser,
     getTags,
     findSubscribers,
-    clearTags
+    clearTags,
+    addBlacklistToUser,
 };
