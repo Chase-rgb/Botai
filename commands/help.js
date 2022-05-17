@@ -11,7 +11,15 @@ const embed = {
       },
       {
         "name": `/unsubcribe`,
+        "value": `Removes tag from subscribe list`
+      },
+      {
+        "name": `/blacklist`,
         "value": `No longer get pinged when someone posts sauce with given tag`
+      },
+      {
+        "name": `/unblacklist`,
+        "value": `Removes tag from blacklist`
       },
       {
         "name": `/my-tags`,

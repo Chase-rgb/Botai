@@ -70,6 +70,15 @@ const removeTagFromUser = (userId, tag) => {
     );
 }
 
+const removeBlacklistFromUser = (userId, tag) => {
+    console.log(`Removing tags: ${tag} from userID: ${userId}`);
+    return User.findByIdAndUpdate(
+        userId,
+        { $pull: {blacklist: {$in: tag}}},
+        { new: true }
+    );
+}
+
 const findSubscribers = (tags) => {
     return User.find(
         { $and : [
@@ -96,4 +105,5 @@ module.exports = {
     findSubscribers,
     clearTags,
     addBlacklistToUser,
+    removeBlacklistFromUser,
 };
