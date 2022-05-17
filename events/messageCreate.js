@@ -1,4 +1,4 @@
-/*
+
 const nhentai = require('nhentai-js');
 const mongoose = require('./../database/mongoose');
 
@@ -84,10 +84,10 @@ module.exports = {
         }
     }
 }
-*/
 
 
 
+/*
 const nhentai = require('nhentai-js');
 const mongoose = require('./../database/mongoose');
 
@@ -180,3 +180,4 @@ module.exports = {
         }
     }
 }
+*/
