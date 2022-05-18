@@ -145,10 +145,12 @@ async function getSubscribers(tags) {
 }
 
 function tagsCleanup(tags) {
+    if (!tags) return []
     return tags.map(tag => tag.match(/^.*?(?= \()/)[0])
 }
 
 async function cloudflareDownInteraction(interaction, sauce) {
+    if (!(await nhentai.exists(sauce))) return false;
     let nhentaiResponse = await getDojinInfo(sauce);
     if (!nhentaiResponse) return false;
     const subscribers = await getSubscribers(nhentaiResponse.details.tags);
