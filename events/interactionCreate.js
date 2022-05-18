@@ -13,6 +13,8 @@
 // 	}
 // });
 
+const wait = require('node:timers/promises').setTimeout;
+
 module.exports = {
     name: 'interactionCreate',
     async execute(interaction) {
@@ -21,6 +23,9 @@ module.exports = {
         const command = interaction.client.commands.get(interaction.commandName);
 
         if (!command) return;
+        
+        await interaction.deferReply();
+        await wait(4000);
 
         try {
             await command.execute(interaction);

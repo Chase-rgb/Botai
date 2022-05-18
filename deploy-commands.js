@@ -17,7 +17,7 @@ exports.execute = () => {
 	const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 	console.log(commands)
 
-	rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands })
+	rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: [] })
 		.then(() => console.log('Successfully registered application commands.'))
 		.catch(console.error);
 };

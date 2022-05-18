@@ -1,4 +1,4 @@
-
+/*
 const nhentai = require('nhentai-js');
 const mongoose = require('./../database/mongoose');
 
@@ -84,10 +84,9 @@ module.exports = {
         }
     }
 }
+*/
 
 
-
-/*
 const nhentai = require('nhentai-js');
 const mongoose = require('./../database/mongoose');
 
@@ -149,6 +148,41 @@ function tagsCleanup(tags) {
     return tags.map(tag => tag.match(/^.*?(?= \()/)[0])
 }
 
+async function cloudflareDownInteraction(interaction, sauce) {
+    let nhentaiResponse = await getDojinInfo(sauce);
+    if (!nhentaiResponse) return false;
+    const subscribers = await getSubscribers(nhentaiResponse.details.tags);
+    interaction.reply({
+        content: formResponse(nhentaiResponse, subscribers)
+    })
+}
+
+async function cloudflareUpBackupInteraction(interaction, sauce) {
+    if (interaction.author.bot) {
+        if ( interaction.type != 'REPLY' || interaction.author.id != process.env.CLIENT_ID || interaction.embeds.length === 0) {return;}
+        else {
+            var response = ""
+            // console.log(interaction.embeds[0].description);
+            const tags = interaction.embeds[0].description.split(/, |,/).map(x => x.toLowerCase());
+            const subscribers = await getSubscribers(tags);
+            console.log(`Subscribers: ${subscribers}`);
+            if (subscribers.length === 0) return;
+            subscribers.forEach(sub => response += `<@${sub}> `);
+            interaction.reply({
+                content: response
+            });
+        }
+    };
+    let digits = interaction.content.match(sixNumsRegex)
+    if (digits && interaction.type == 'DEFAULT') {
+        for (const sauce in digits) {
+            interaction.reply({
+                content: `https://nhentai.net/g/${digits[sauce]}`
+            })
+        }
+    }
+}
+
 const sixNumsRegex = /\b\d{6}\b/g;
 
 module.exports = {
@@ -158,21 +192,10 @@ module.exports = {
         if (interaction.author.bot) return;
         let digits = interaction.content.match(sixNumsRegex)
         if (digits) {
-            for (const sauce in digits) {
+            for (const index in digits) {
+                let sauce = "" + +digits[index]
                 try {
-                    console.log(`Sauce: ${digits[sauce]}`);
-                    let nhentaiResponse = await getDojinInfo(digits[sauce]);
-                    console.log(nhentaiResponse);
-                    if (nhentaiResponse) {
-                        const subscribers = await getSubscribers(nhentaiResponse.details.tags);
-                        interaction.reply({
-                            content: formResponse(nhentaiResponse, subscribers)
-                        })
-                    } else {
-                        interaction.reply({
-                            content: `Doujin ${digits[sauce]} doesn't exist`
-                        })
-                    }
+                   if (!cloudflareDownInteraction(interaction, sauce)) cloudflareUpBackupInteraction(interaction, sauce);
                 } catch (e) {
                     console.log(e)
                 }
@@ -180,4 +203,3 @@ module.exports = {
         }
     }
 }
-*/
