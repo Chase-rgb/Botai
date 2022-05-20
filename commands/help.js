@@ -28,6 +28,10 @@ const embed = {
       {
         "name": `/clear-subscriptions`,
         "value": `Removes all your subscriptions`
+      },
+      {
+        "name": `/random <useMySubscriptions>`,
+        "value": `Finds a random doujin. Can input certain tags or use your subscribed tags`
       }
     ],
     "thumbnail": {

@@ -90,6 +90,8 @@ module.exports = {
 const nhentai = require('nhentai-js');
 const mongoose = require('./../database/mongoose');
 
+var cloudflareDown = true;
+
 // const sixNumsRegex = /\b\d{6}\b/g;
 // client.on('messageCreate', async (message) => {
 //     if (message.author.bot) return;
@@ -117,8 +119,8 @@ const mongoose = require('./../database/mongoose');
 
 async function getDojinInfo(sauce) {
     // console.log(sauce)
-    if(await nhentai.exists(sauce)) { // checks if doujin exists
-        const dojin = await nhentai.getDoujin(sauce)
+    if(await nhentai.exists(sauce.toString())) { // checks if doujin exists
+        const dojin = await nhentai.getDoujin(sauce.toString())
         // console.log(dojin);
         return dojin;
     } else {
@@ -150,7 +152,11 @@ function tagsCleanup(tags) {
 }
 
 async function cloudflareDownInteraction(interaction, sauce) {
-    if (!(await nhentai.exists(sauce))) return false;
+    console.log('Normal ran')
+    //When cloudflare goes down, this will always result in false
+    //We need to set the cloudflareDown variable to false
+    //This functionality needs to be tested
+    if (!(await nhentai.exists(sauce.toString()))) return false;
     let nhentaiResponse = await getDojinInfo(sauce);
     if (!nhentaiResponse) return false;
     const subscribers = await getSubscribers(nhentaiResponse.details.tags);
@@ -159,8 +165,27 @@ async function cloudflareDownInteraction(interaction, sauce) {
     })
 }
 
-async function cloudflareUpBackupInteraction(interaction, sauce) {
-    if (interaction.author.bot) {
+async function cloudflareUpBackupInteraction(interaction) {
+    console.log('Backup ran')
+    if (interaction.author.bot && !cloudflareDown) {
+        if ( interaction.type != 'REPLY' || interaction.author.id != process.env.CLIENT_ID || interaction.embeds.length === 0) {return;}
+        else {
+            var response = ""
+            // console.log(interaction.embeds[0].description);
+            const tags = interaction.embeds[0].description.split(/, |,/).map(x => x.toLowerCase());
+            const subscribers = await getSubscribers(tags);
+            console.log(`Subscribers: ${subscribers}`);
+            if (subscribers.length === 0) return;
+            subscribers.forEach(sub => response += `<@${sub}> `);
+            interaction.reply({
+                content: response
+            });
+        }
+    }
+}
+
+/*
+if (interaction.author.bot) {
         if ( interaction.type != 'REPLY' || interaction.author.id != process.env.CLIENT_ID || interaction.embeds.length === 0) {return;}
         else {
             var response = ""
@@ -183,7 +208,7 @@ async function cloudflareUpBackupInteraction(interaction, sauce) {
             })
         }
     }
-}
+    */
 
 const sixNumsRegex = /\b\d{6}\b/g;
 
@@ -191,17 +216,23 @@ module.exports = {
     name: 'messageCreate',
     async execute(interaction) {
         // console.log(interaction.author);
+        cloudflareUpBackupInteraction(interaction);
         if (interaction.author.bot) return;
         let digits = interaction.content.match(sixNumsRegex)
         if (digits) {
             for (const index in digits) {
                 let sauce = "" + +digits[index]
                 try {
-                   if (!cloudflareDownInteraction(interaction, sauce)) cloudflareUpBackupInteraction(interaction, sauce);
+                   if (!cloudflareDownInteraction(interaction, sauce)) {
+                        interaction.reply({
+                            content: `https://nhentai.net/g/${digits[sauce]}`
+                        })
+                   };
                 } catch (e) {
                     console.log(e)
                 }
             }
         }
-    }
+    },
+    cloudflareDownInteraction
 }
