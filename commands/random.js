@@ -13,7 +13,7 @@ async function randWithUserTags(userId) {
     const tags = response.tags;
     const blacklists = response.blacklist
     if (tags && tags.length != 0) {
-        queryList.push('"' + tags[Math.floor(Math.random() * tags.length)] + '"');
+        queryList.push('"' + tags[Math.floor(Math.random() * tags.length)].replace(" ", '+') + '"');
     }
     // console.log(`Blacklist: ${blacklists}`)
     if (blacklists && blacklists.length != 0) {
